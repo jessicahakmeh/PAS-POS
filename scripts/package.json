@@ -1,0 +1,1 @@
+{"name":"pas-scripts","private":true,"type":"module","dependencies":{"firebase":"9.22.1","puppeteer-core":"^25.12.0","xlsx":"^0.18.5"}}
