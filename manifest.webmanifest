@@ -1,0 +1,9 @@
+{
+  "name": "PAS",
+  "short_name": "PAS",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#0B66B3",
+  "theme_color": "#0B66B3",
+  "icons": [{ "src": "PAS.jpeg", "sizes": "any", "type": "image/jpeg" }]
+}

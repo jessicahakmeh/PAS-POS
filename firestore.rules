@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // NOTE: Firebase Authentication is not used (Spark plan), so rules cannot identify the caller.
+    // Every path below is protected by an unguessable secret embedded in the path, and listing is
+    // only allowed where the parent path is itself secret. See core.js for the full model.
+
+    // Tenant name registry: create-only, so a tenant ID can be claimed once and never overwritten or deleted.
+    match /tenants/{tenantId} {
+      allow create: if true;
+      allow get, list, update, delete: if false;
+
+      // Login records. The document id is derived from (tenant, username, password) with PBKDF2, so it is
+      // unguessable; the content is the tenant's dataKey encrypted with a key derived from the password.
+      match /logins/{loginId} {
+        allow get, create, update, delete: if true;
+        allow list: if false;
+      }
+    }
+
+    // Platform admin login records (same scheme). Unlocks the adminKey.
+    match /platformLogins/{loginId} {
+      allow get, create, update, delete: if true;
+      allow list: if false;
+    }
+
+    // Admin registry of tenants, under the secret adminKey (only known after admin login).
+    match /platform/{adminKey}/tenants/{tenantId} {
+      allow read, write: if true;
+    }
+
+    // Tenant data (items, customers, suppliers, users, roles, meta) under the secret per-tenant dataKey.
+    match /data/{dataKey}/{coll}/{docId} {
+      allow read, write: if coll in ['inventory', 'customers', 'suppliers', 'supplierPrices', 'batches', 'wasteLog', 'stockLedger', 'salesOrders', 'purchaseOrders', 'expenses', 'users', 'roles', 'meta'];
+    }
+  }
+}
